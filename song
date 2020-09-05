@@ -1,0 +1,20 @@
+import json
+import requests
+import re
+from hoshino.service import Service
+sv = Service("qq音乐",enable_on_default=True,visible = True)
+@sv.on_rex(r'^qq点歌([\S\s]*)')
+async def song(bot,ctx,match):
+    headers = {
+                'User-Agent':'Mozilla/5.0(Macintosh;U;IntelMacOSX10_6_8;en-us)AppleWebKit/534.50(KHTML,likeGecko)Version/5.1Safari/534.50',
+                'Host':'c.y.qq.com'
+            }
+    #print('1')
+    target = match.group(1)
+    #print(target)
+    #print('2')
+    url = f'https://c.y.qq.com/soso/fcgi-bin/client_search_cp?p=1&n=2&w={target}&format=json'
+    data = requests.get(url, headers=headers).text
+    j = json.loads(data)
+    d = j["data"]["song"]["list"][0]["songid"]
+    await bot.send(ctx, f'[CQ:music,type=qq,id={d}]')
